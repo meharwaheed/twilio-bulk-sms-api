@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CompainNumber extends Model
+class Campaign extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['compain_id', 'phone'];
+    protected $fillable = ['title'];
 }

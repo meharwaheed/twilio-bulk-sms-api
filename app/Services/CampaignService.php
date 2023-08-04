@@ -1,29 +1,16 @@
 <?php
+namespace App\Services;
 
-namespace App\Http\Controllers\V1;
-
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Campaign;
+use App\Models\CampaignNumber;
 use Illuminate\Support\LazyCollection;
-use App\Models\Compain;
-use App\Models\CompainNumber;
 
-
-class CompainController extends Controller
-{
-    public function store(Request $request)
-    {
-        $request->validate(['file' => 'required|mimes:csv']);
-        $this->importCompains($request->file);
-        return $this->respond(Compain::all(), 'Compains imported successfully');
-    }
-
+class CampaignService {
 
     /**
-     * import csv to databas
+     * import campaigns csv to database
      */
-    private function importCompains($file)
+    public function importCampaigns($file)
     {
         LazyCollection::make(function () use ($file) {
             $handle = fopen($file, 'r');
@@ -47,8 +34,8 @@ class CompainController extends Controller
             })->toArray();
 
             foreach($records as $row) {
-                $compain = Compain::updateOrCreate(['title' => $row['title']]);
-                $compain_number = CompainNumber::updateOrCreate(['compain_id' => $compain->id, 'phone' => $row['phone']]);
+                $campaign = Campaign::updateOrCreate(['title' => $row['title']]);
+                CampaignNumber::updateOrCreate(['campaign_id' => $campaign->id, 'phone' => $row['phone']]);
             }
         });
     }

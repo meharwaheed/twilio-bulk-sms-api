@@ -13,9 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('compains', function (Blueprint $table) {
+        Schema::create('campaign_numbers', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->foreignId('campaign_id')->constrained('campaigns')->onDelete('cascade');
+            $table->string('phone');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('compains');
+        Schema::dropIfExists('campaign_numbers');
     }
 };

@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\V1\CompainController;
+use App\Http\Controllers\V1\CampaignController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +30,6 @@ Route::controller(AuthController::class)->prefix('auth')->group(function () {
     Route::get('/logout', 'logout')->middleware('auth:sanctum');
 });
 
-Route::controller(CompainController::class)->prefix('compain')->group(function () {
+Route::controller(CampaignController::class)->prefix('campaign')->group(function () {
     Route::post('/csv', 'store');
 });
