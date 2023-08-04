@@ -9,5 +9,5 @@ class CompainNumber extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'phone'];
+    protected $fillable = ['compain_id', 'phone'];
 }
