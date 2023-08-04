@@ -9,5 +9,5 @@ class Campaign extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title'];
+    protected $fillable = ['title', 'bulk_sms_id'];
 }

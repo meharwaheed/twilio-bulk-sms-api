@@ -32,4 +32,5 @@ Route::controller(AuthController::class)->prefix('auth')->group(function () {
 
 Route::controller(CampaignController::class)->prefix('campaign')->group(function () {
     Route::post('/csv', 'store');
+    Route::get('/schedule/bulk-sms', 'getScheduleSms');
 });

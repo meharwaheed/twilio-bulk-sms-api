@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->foreignId('bulk_sms_id')->constrained('bulk_sms')->onDelete('cascade');
             $table->timestamps();
         });
     }
