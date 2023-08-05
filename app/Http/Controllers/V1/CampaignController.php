@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Services\CampaignService;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class CampaignController extends Controller
 {
@@ -51,8 +52,8 @@ class CampaignController extends Controller
 
         try{
             if($request->hasFile('csv_file')) {
-                $path = rand(0000, 9999). $request->csv_file->getClientOriginalName();
-                $request->file('csv_file')->store($path, ['disk' => 'public']);
+                $path = 'campaigns/'.rand(0000, 9999). $request->csv_file->getClientOriginalName();
+                Storage::disk(env('STORAGE_DISK', 'public'))->put($path, file_get_contents($request->csv_file));
                 $validated['csv_file'] = $path;
             }
 

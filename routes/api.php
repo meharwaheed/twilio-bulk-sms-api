@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\V1\CampaignController;
 use App\Http\Controllers\V1\AutoResponseController;
+use App\Http\Controllers\V1\VoipController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,12 @@ Route::controller(CampaignController::class)
 
 Route::controller(AutoResponseController::class)
     ->prefix('auto-response')
+    ->group(function () {
+        Route::post('/store', 'store');
+    });
+
+Route::controller(VoipController::class)
+    ->prefix('voip')
     ->group(function () {
         Route::post('/store', 'store');
     });
