@@ -15,8 +15,14 @@ return new class extends Migration
     {
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->foreignId('bulk_sms_id')->constrained('bulk_sms')->onDelete('cascade');
+            $table->string('blast_name');
+            $table->string('from_number');
+            $table->text('message');
+            $table->boolean('is_schedule')->default(0);
+            $table->timestamp('schedule_date')->nullable();
+            $table->string('timezone')->nullable();
+            $table->string('csv_file')->nullable();
+            $table->boolean('status')->default(0);
             $table->timestamps();
         });
     }

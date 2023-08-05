@@ -2,17 +2,20 @@
 namespace App\Services;
 
 use App\Models\Campaign;
-use App\Models\CampaignNumber;
 use Illuminate\Support\LazyCollection;
 
 class CampaignService {
 
     /**
      * import campaigns csv to database
+     *
+     * @param $campaign_id
+     * @param $file
+     * @return void
      */
-    public function importCampaigns($bulk_sms_id, $file)
+    public function importCampaigns($campaign_id, $file): void
     {
-        LazyCollection::make(function () use ($bulk_sms_id, $file) {
+        LazyCollection::make(function () use ($campaign_id, $file) {
             $handle = fopen($file, 'r');
 
             while (($line = fgetcsv($handle, 4096)) !== false) {
@@ -25,18 +28,15 @@ class CampaignService {
         })
         ->skip(1)
         ->chunk(1000)
-        ->each(function (LazyCollection $chunk) use($bulk_sms_id) {
+        ->each(function (LazyCollection $chunk) use($campaign_id) {
             $records = $chunk->map(function ($row) {
               return [
-                  "title" => $row[0],
-                  "phone" => $row[1],
+                  "phone" => $row[0],
               ];
             })->toArray();
 
-            foreach($records as $row) {
-                $campaign = Campaign::updateOrCreate(['title' => $row['title'], 'bulk_sms_id' => $bulk_sms_id]);
-                CampaignNumber::updateOrCreate(['campaign_id' => $campaign->id, 'phone' => $row['phone']]);
-            }
+            $campaign = Campaign::findOrFail($campaign_id);
+            $campaign->campaignNumbers()->createMany($records);
         });
     }
 }

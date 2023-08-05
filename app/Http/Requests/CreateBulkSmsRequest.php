@@ -24,11 +24,12 @@ class CreateBulkSmsRequest extends FormRequest
     public function rules()
     {
         return [
-            'csv_file' => 'required|mimes:csv',
+            'csv_file' => 'required|mimes:csv,txt',
             'blast_name' => 'required|string',
             'from_number' => 'required|string',
             'is_schedule' => 'required|boolean',
             'schedule_date' => 'required_if:is_schedule,1',
+            'timezone' => 'required_if:is_schedule,1',
             'message' => 'required|string'
         ];
     }

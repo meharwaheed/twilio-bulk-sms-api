@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateBulkSmsRequest;
-use App\Models\BulkSms;
 use App\Models\Campaign;
 use Illuminate\Http\Request;
 use App\Services\CampaignService;
@@ -13,6 +12,9 @@ use Illuminate\Http\JsonResponse;
 
 class CampaignController extends Controller
 {
+    /**
+     * @param CampaignService $campaign_service
+     */
     public function __construct(private CampaignService $campaign_service)
     {
 
@@ -28,12 +30,9 @@ class CampaignController extends Controller
     public function getScheduleSms(Request $request): JsonResponse
     {
         $per_page = $request->get('per_page', 10);
-        $data = BulkSms::whereIsSchedule(true)->paginate($per_page);
+        $data = Campaign::whereIsSchedule(true)->paginate($per_page);
         return $this->respond($data, 'success');
     }
-
-
-
 
 
     /**
@@ -56,12 +55,12 @@ class CampaignController extends Controller
                 $validated['csv_file'] = $path;
             }
 
-            $bulk_sms = BulkSms::create($validated);
+            $campaign = Campaign::create($validated);
 
             /**
              * Import CSV Campaigns into DB
              */
-            $this->campaign_service->importCampaigns($bulk_sms->id, $request->csv_file);
+            $this->campaign_service->importCampaigns($campaign->id, $request->csv_file);
             return $this->respond(Campaign::all(), 'Campaigns imported successfully');
 
         } catch(Exception $e) {
