@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\V1\CampaignController;
+use App\Http\Controllers\V1\AutoResponseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,13 +25,23 @@ Route::get('/example', function () {
     return ['message' => 'This is an example API route.'];
 });
 
-Route::controller(AuthController::class)->prefix('auth')->group(function () {
-    Route::post('/login', 'login');
-    Route::post('/register', 'register');
-    Route::get('/logout', 'logout')->middleware('auth:sanctum');
-});
+Route::controller(AuthController::class)
+    ->prefix('auth')
+    ->group(function () {
+        Route::post('/login', 'login');
+        Route::post('/register', 'register');
+        Route::get('/logout', 'logout')->middleware('auth:sanctum');
+    });
 
-Route::controller(CampaignController::class)->prefix('campaign')->group(function () {
-    Route::post('/csv', 'store');
-    Route::get('/schedule/bulk-sms', 'getScheduleSms');
-});
+Route::controller(CampaignController::class)
+    ->prefix('campaign')
+    ->group(function () {
+        Route::post('/csv', 'store');
+        Route::get('/schedule/bulk-sms', 'getScheduleSms');
+    });
+
+Route::controller(AutoResponseController::class)
+    ->prefix('auto-response')
+    ->group(function () {
+        Route::post('/store', 'store');
+    });

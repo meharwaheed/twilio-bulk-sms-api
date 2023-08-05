@@ -17,7 +17,7 @@ class CampaignController extends Controller
      */
     public function __construct(private CampaignService $campaign_service)
     {
-
+        $this->middleware('auth:sanctum');
     }
 
 
@@ -31,7 +31,8 @@ class CampaignController extends Controller
     {
         $per_page = $request->get('per_page', 10);
         $data = Campaign::whereIsSchedule(true)->paginate($per_page);
-        return $this->respond($data, 'success');
+
+        return $this->respond(data: $data, message: 'success');
     }
 
 
@@ -61,10 +62,11 @@ class CampaignController extends Controller
              * Import CSV Campaigns into DB
              */
             $this->campaign_service->importCampaigns($campaign->id, $request->csv_file);
-            return $this->respond(Campaign::all(), 'Campaigns imported successfully');
+
+            return $this->respond(data: $campaign, message: 'Campaigns imported successfully');
 
         } catch(Exception $e) {
-            return $this->error($e->getMessage());
+            return $this->error(message: $e->getMessage());
         }
     }
 
