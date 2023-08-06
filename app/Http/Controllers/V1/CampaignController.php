@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Actions\SendBulkSMS;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateBulkSmsRequest;
 use App\Models\Campaign;
@@ -38,12 +39,13 @@ class CampaignController extends Controller
 
 
     /**
-     * Import Campaigns CSVs
+     * Import Campaigns CSVs & Sending bulk sms if sms is not scheduled
      *
      * @param CreateBulkSmsRequest $request
+     * @param SendBulkSMS $sendBulkSMS
      * @return JsonResponse
      */
-    public function store(CreateBulkSmsRequest $request): JsonResponse
+    public function store(CreateBulkSmsRequest $request, SendBulkSMS $sendBulkSMS): JsonResponse
     {
         /**
          * Validate Request
@@ -63,8 +65,17 @@ class CampaignController extends Controller
              * Import CSV Campaigns into DB
              */
             $this->campaign_service->importCampaigns($campaign->id, $request->csv_file);
+            $message = 'Bulk Sms scheduled successfully';
 
-            return $this->respond(data: $campaign, message: 'Campaigns imported successfully');
+            /**
+             * Sending Bulk Sms if not is_schedule
+             */
+            if (!$request->is_schedule){
+                $sendBulkSMS->send(campaign: $campaign);
+                $message = 'Bulk Sms send successfully';
+            }
+
+            return $this->respond(data: $campaign, message: $message);
 
         } catch(Exception $e) {
             return $this->error(message: $e->getMessage());

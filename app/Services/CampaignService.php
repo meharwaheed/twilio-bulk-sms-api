@@ -27,7 +27,7 @@ class CampaignService {
             fclose($handle);
         })
         ->skip(1)
-        ->chunk(1000)
+        ->chunk(500)
         ->each(function (LazyCollection $chunk) use($campaign_id) {
             $records = $chunk->map(function ($row) {
               return [

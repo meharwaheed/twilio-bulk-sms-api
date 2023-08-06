@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('from_number');
             $table->text('message');
             $table->boolean('is_schedule')->default(0);
-            $table->timestamp('schedule_date')->nullable();
+            $table->dateTime('schedule_date')->nullable();
             $table->string('timezone')->nullable();
             $table->string('csv_file')->nullable();
             $table->boolean('status')->default(0);
