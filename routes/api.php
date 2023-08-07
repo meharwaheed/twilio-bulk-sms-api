@@ -37,6 +37,7 @@ Route::controller(AuthController::class)
 Route::controller(CampaignController::class)
     ->prefix('campaign')
     ->group(function () {
+        Route::get('/reports', 'index');
         Route::post('/csv', 'store');
         Route::get('/schedule/bulk-sms', 'getScheduleSms');
     });

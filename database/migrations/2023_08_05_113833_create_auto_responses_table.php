@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('phone');
             $table->text('message');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }

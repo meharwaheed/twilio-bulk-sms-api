@@ -22,7 +22,8 @@ return new class extends Migration
             $table->dateTime('schedule_date')->nullable();
             $table->string('timezone')->nullable();
             $table->string('csv_file')->nullable();
-            $table->boolean('status')->default(0);
+            $table->enum('status', ['delivered', 'pending', 'undelivered'])->default('pending');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }

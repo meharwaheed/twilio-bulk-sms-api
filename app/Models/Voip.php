@@ -9,5 +9,5 @@ class Voip extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['phone', 'file'];
+    protected $fillable = ['phone', 'file', 'user_id'];
 }

@@ -10,6 +10,12 @@ use Illuminate\Http\JsonResponse;
 class AutoResponseController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
+
+
     /**
      * Store auto response for phone number
      *
@@ -24,7 +30,10 @@ class AutoResponseController extends Controller
         ]);
 
         $auto_response = AutoResponse::updateOrCreate(
-            ['phone' => $validated['phone']],
+            [
+                'phone' => $validated['phone'],
+                'user_id' => auth()->user()->id
+            ],
             ['message' => $validated['message']]
         );
 

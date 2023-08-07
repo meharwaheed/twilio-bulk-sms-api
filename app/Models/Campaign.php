@@ -19,6 +19,7 @@ class Campaign extends Model
         'timezone',
         'status',
         'csv_file',
+        'user_id',
     ];
 
 
@@ -40,7 +41,6 @@ class Campaign extends Model
      */
     protected $casts = [
         'is_schedule' => 'boolean',
-        'status' => 'boolean',
         'schedule_date' => 'datetime',
     ];
 }

@@ -38,7 +38,10 @@ class VoipController extends Controller
             $validated['file'] = $path;
         }
         $voip = Voip::updateOrCreate(
-            ['phone' => $validated['phone']],
+            [
+                'phone' => $validated['phone'],
+                'user_id' => auth()->user()->id
+            ],
             ['file' => $validated['file']],
         );
 
