@@ -24,5 +24,13 @@ class UserSeeder extends Seeder
                 'password' => Hash::make(12345678),
             ]
         ]);
+
+        User::insert([
+            [
+                'name' => 'Blast admin',
+                'email' => 'admin@blast.com',
+                'password' => Hash::make(12345678),
+            ]
+        ]);
     }
 }

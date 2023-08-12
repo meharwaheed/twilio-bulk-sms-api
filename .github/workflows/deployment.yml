@@ -1,0 +1,26 @@
+name: PROD
+on:
+  push:
+    branches: [ release ]
+  workflow_dispatch:
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Docker
+        run: |
+          docker login dock.abdulwaheed.me -u waheed -p ${{ secrets.DOCKER_PWD }}
+          docker pull dock.abdulwaheed.me/blast_api:latest
+          docker build -t dock.abdulwaheed.me/blast_api:latest .
+          docker push dock.abdulwaheed.me/blast_api:latest
+  Deploy:
+    runs-on: ubuntu-latest
+    needs: [Build]
+    steps:
+      - name: Deploy API
+        uses: steebchen/kubectl@v2.0.0
+        with:
+          config: ${{ secrets.KUBE_CONFIG }}
+          command: '-n blast rollout restart deployment/blast'
