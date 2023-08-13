@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\Campaign;
+use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Twilio\Rest\Client;
 
@@ -14,17 +15,20 @@ class SendBulkSMS
     {
         $sid    = env( 'TWILIO_SID' );
         $token  = env( 'TWILIO_TOKEN' );
+        $notify_sid = env('TWILIO_NOTIFY_SID');
+
         $client = new Client( $sid, $token );
 
-        foreach ($campaign->campaignNumbers as $number) {
-            $client->messages->create(
-                $number,
-                [
-                    'from' => $campaign->from_number,
-                    'body' => $campaign->message,
-                ]
-            );
+        $members = [];
+        foreach ($campaign->campaignNumbers as $phone) {
+            $members[] = json_encode(["binding_type" => "sms", "address" => $phone->phone]);
         }
-        $campaign->update(['status' => 'delivered']);
+
+        $notification = $client->notify->v1->services($notify_sid)
+            ->notifications->create([
+                "toBinding" => $members,
+                "body" => $campaign->message,
+            ]);
+
     }
 }
