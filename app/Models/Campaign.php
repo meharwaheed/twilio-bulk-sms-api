@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -22,6 +23,14 @@ class Campaign extends Model
         'user_id',
     ];
 
+    protected $appends = ['csv_file_path'];
+
+    public function csvFilePath(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->csv_file ? asset('storage') . '/' . $this->csv_file : null
+        );
+    }
 
     /**
      * Get the numbers for the campaign

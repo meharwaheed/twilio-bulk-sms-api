@@ -11,6 +11,7 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "lorisleiva/laravel-actions": "^2.7",
+        "maatwebsite/excel": "^3.1.48",
         "twilio/sdk": "^7.7"
     },
     "require-dev": {

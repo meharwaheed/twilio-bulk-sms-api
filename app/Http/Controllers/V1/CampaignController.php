@@ -5,21 +5,20 @@ namespace App\Http\Controllers\V1;
 use App\Actions\SendBulkSMS;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateBulkSmsRequest;
+use App\Imports\CampaignNumbersImport;
 use App\Models\Campaign;
 use App\Models\CampaignNumber;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Services\CampaignService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CampaignController extends Controller
 {
-    /**
-     * @param CampaignService $campaign_service
-     */
-    public function __construct(private CampaignService $campaign_service)
+
+    public function __construct()
     {
         $this->middleware('auth:sanctum');
     }
@@ -85,7 +84,8 @@ class CampaignController extends Controller
             /**
              * Import CSV Campaigns into DB
              */
-            $this->campaign_service->importCampaigns($campaign->id, $request->csv_file);
+
+            Excel::import(new CampaignNumbersImport(campaign_id: $campaign->id), filePath: $request->file('csv_file'));
             $message = 'Bulk Sms scheduled successfully';
 
             /**
