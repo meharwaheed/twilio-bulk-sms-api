@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\V1\CampaignController;
 use App\Http\Controllers\V1\AutoResponseController;
 use App\Http\Controllers\V1\VoipController;
+use App\Http\Controllers\V1\OptOutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +51,12 @@ Route::controller(AutoResponseController::class)
 
 Route::controller(VoipController::class)
     ->prefix('voip')
+    ->group(function () {
+        Route::post('/store', 'store');
+    });
+
+Route::controller(OptOutController::class)
+    ->prefix('optout')
     ->group(function () {
         Route::post('/store', 'store');
     });
