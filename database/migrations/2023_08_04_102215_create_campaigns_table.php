@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('message');
             $table->boolean('is_schedule')->default(0);
             $table->dateTime('schedule_date')->nullable();
+            $table->timestamp('converted_date')->nullable();
             $table->string('timezone')->nullable();
             $table->string('csv_file')->nullable();
             $table->enum('status', ['delivered', 'pending', 'undelivered'])->default('pending');

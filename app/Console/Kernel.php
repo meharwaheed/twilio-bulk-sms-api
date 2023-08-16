@@ -16,8 +16,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->job(scheduleBulkSms::class)->everyMinute();
-        // $schedule->command('inspire')->hourly();
+//        $schedule->job(scheduleBulkSms::class)->everyMinute();
+         $schedule->command('send:scheduled-sms')->everyMinute();
+         $schedule->command('queue:work --stop-when-empty')
+            ->everyMinute()
+            ->withoutOverlapping();
     }
 
     /**

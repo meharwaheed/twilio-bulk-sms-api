@@ -47,6 +47,7 @@ Route::controller(AutoResponseController::class)
     ->prefix('auto-response')
     ->group(function () {
         Route::post('/store', 'store');
+        Route::post('/send', 'autoResponder');
     });
 
 Route::controller(VoipController::class)

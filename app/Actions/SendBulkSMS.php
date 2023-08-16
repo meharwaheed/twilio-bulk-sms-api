@@ -30,5 +30,7 @@ class SendBulkSMS
                 "body" => $campaign->message,
             ]);
 
+        $campaign->update(['status' => 'delivered']);
+
     }
 }

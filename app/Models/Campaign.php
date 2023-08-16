@@ -21,6 +21,7 @@ class Campaign extends Model
         'status',
         'csv_file',
         'user_id',
+        'converted_date'
     ];
 
     protected $appends = ['csv_file_path'];

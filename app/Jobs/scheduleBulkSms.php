@@ -35,15 +35,13 @@ class scheduleBulkSms implements ShouldQueue
     public function handle(SendBulkSMS $sendBulkSMS)
     {
         $campaigns = Campaign::whereIsSchedule(true)
-            ->whereStatus(false)
-            ->whereRaw('schedule_date', '<=', Carbon::now('Asia/Karachi'))
+            ->whereStatus('pending')
+            ->whereRaw('converted_date', '<=', Carbon::now())
             ->get();
 
         if (isset($campaigns) && count($campaigns)) {
             foreach ($campaigns as $campaign) {
                 $sendBulkSMS->send(campaign: $campaign);
-                $campaign->status = 1;
-                $campaign->save();
             }
         }
     }

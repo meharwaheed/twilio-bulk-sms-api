@@ -11,9 +11,30 @@ class CampaignNumber extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['campaign_id', 'phone'];
+    protected $fillable = [
+        'campaign_id',
+        'phone',
+        'is_active',
+        'status'
+    ];
 
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var string[]
+     */
     protected $appends = ['created_at_formatted'];
+
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var string[]
+     */
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     public function createdAtFormatted(): Attribute
     {

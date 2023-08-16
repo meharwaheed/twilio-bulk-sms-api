@@ -79,6 +79,12 @@ class CampaignController extends Controller
             }
             $validated['user_id'] = auth()->user()->id;
 
+            if($request->is_schedule) {
+                $date = Carbon::parse($request->schedule_date, $request->timezone);
+                $date->setTimezone(env('APP_TIMEZONE'));
+                $validated['converted_date'] = $date;
+            }
+
             $campaign = Campaign::create($validated);
 
             /**
