@@ -36,7 +36,7 @@ class scheduleBulkSms implements ShouldQueue
     {
         $campaigns = Campaign::whereIsSchedule(true)
             ->whereStatus('pending')
-            ->whereRaw('converted_date', '<=', Carbon::now())
+            ->whereDate('converted_date', '<=', Carbon::now())
             ->get();
 
         if (isset($campaigns) && count($campaigns)) {
