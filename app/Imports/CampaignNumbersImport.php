@@ -25,7 +25,7 @@ class CampaignNumbersImport implements ToModel, WithChunkReading, WithStartRow
     {
         return new CampaignNumber([
             'campaign_id' => $this->campaign_id,
-            'phone' => $row[0],
+            'phone' => "+" . str_replace('+', '', $row[0]),
         ]);
     }
 

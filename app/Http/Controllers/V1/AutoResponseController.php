@@ -53,6 +53,8 @@ class AutoResponseController extends Controller
      */
     public function autoResponder(Request $request): JsonResponse
     {
+        $request->validate(['user_message' => 'required', 'from' => 'required']);
+
         try {
             $outKeyword = OptOut::whereOutKeywords($request->user_message)->first();
             $inKeyword = OptOut::whereInKeywords($request->user_message)->first();
