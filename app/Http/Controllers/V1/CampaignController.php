@@ -28,9 +28,17 @@ class CampaignController extends Controller
         $per_page = $request->get('per_page', 10);
         $data = $this->getGraphData();
 
-        $campaign_ids = Campaign::whereUserId(auth()->user()->id)->pluck('id');
+        $campaign_ids = Campaign::whereUserId(auth()->user()->id)
+            ->where('from_number', 'like', '%' . $request->from_number . '%')
+            ->pluck('id');
 
         $data['campaign_messages'] = CampaignNumber::whereIn('campaign_id', $campaign_ids)
+            ->when($request->to_number, function ($query) use ($request) {
+                return $query->where('phone', 'like', '%' . $request->to_number . '%');
+            })
+            ->when($request->status == 'Pending', function ($query) use ($request) {
+                return $query->whereStatus($request->status);
+            })
             ->with('campaign:id,blast_name,status,from_number')
             ->latest()
             ->paginate($per_page);

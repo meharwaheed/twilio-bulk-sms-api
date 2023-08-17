@@ -24,7 +24,7 @@ class CampaignNumber extends Model
      *
      * @var string[]
      */
-    protected $appends = ['created_at_formatted'];
+    protected $appends = ['updated_at_formatted'];
 
 
     /**
@@ -36,10 +36,10 @@ class CampaignNumber extends Model
         'is_active' => 'boolean',
     ];
 
-    public function createdAtFormatted(): Attribute
+    public function updatedAtFormatted(): Attribute
     {
         return new Attribute(
-            get: fn() => date('d/m/y h:i A', strtotime($this->created_at))
+            get: fn() => date('d/m/y h:i A', strtotime($this->updated_at))
         );
     }
 

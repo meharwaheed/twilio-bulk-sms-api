@@ -61,3 +61,13 @@ Route::controller(OptOutController::class)
     ->group(function () {
         Route::post('/store', 'store');
     });
+
+Route::get('/campaigns/sample/csv', function () {
+$filepath = public_path('data-samples/campaigns.csv');
+return response()->download($filepath);
+});
+
+Route::get('/optouts/sample/csv', function () {
+$filepath = public_path('data-samples/optouts.csv');
+return response()->download($filepath);
+});
