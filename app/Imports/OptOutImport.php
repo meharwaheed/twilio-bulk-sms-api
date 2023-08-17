@@ -8,7 +8,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class OptOutImport implements ToModel, ShouldQueue, WithStartRow, WithChunkReading
+class OptOutImport implements ToModel, WithStartRow, WithChunkReading
 {
     /**
     * @param  $row

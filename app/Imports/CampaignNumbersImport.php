@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class CampaignNumbersImport implements ToModel, ShouldQueue, WithChunkReading, WithStartRow
+class CampaignNumbersImport implements ToModel, WithChunkReading, WithStartRow
 {
 
     private $campaign_id;
