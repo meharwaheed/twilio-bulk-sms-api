@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignId('campaign_id')->constrained('campaigns')->onDelete('cascade');
             $table->string('phone');
             $table->boolean('is_active')->default(1);
-            $table->enum('status', ['delivered', 'pending', 'undelivered'])->default('pending');
+            $table->string('status')->default('Pending');
+//            $table->enum('status', ['delivered', 'pending', 'undelivered'])->default('pending');
             $table->timestamps();
         });
     }

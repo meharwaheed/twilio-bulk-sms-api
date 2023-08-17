@@ -7,7 +7,7 @@ use App\Http\Controllers\V1\CampaignController;
 use App\Http\Controllers\V1\AutoResponseController;
 use App\Http\Controllers\V1\VoipController;
 use App\Http\Controllers\V1\OptOutController;
-
+use App\Http\Controllers\V1\TwilioCallBackController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -47,8 +47,14 @@ Route::controller(AutoResponseController::class)
     ->prefix('auto-response')
     ->group(function () {
         Route::post('/store', 'store');
-        Route::post('/send', 'autoResponder');
+//        Route::post('/send', 'autoResponder');
     });
+
+
+Route::group(['prefix'=>'twilio'], function(){
+    Route::post('/sms-auto-responder-callback', [AutoResponseController::class, 'autoResponder']);
+    Route::post('/sms-delivery-status-callback/{campaign_id}', [TwilioCallBackController::class, 'changeSMSDeliveryStatus']);
+});
 
 Route::controller(VoipController::class)
     ->prefix('voip')
