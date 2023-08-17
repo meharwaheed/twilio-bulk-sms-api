@@ -28,7 +28,7 @@ class SendBulkSMS
             ->notifications->create([
                 "toBinding" => $members,
                 "body" => $campaign->message,
-                'sms' => ['status_callback' => env('APP_URL')."/sms-delivery-status-callback/". $campaign->id ]
+                'sms' => ['status_callback' => env('APP_URL_CALLBACK')."/api/twilio/sms-delivery-status-callback/". $campaign->id ]
             ]);
 
         $campaign->update(['status' => 'delivered']);

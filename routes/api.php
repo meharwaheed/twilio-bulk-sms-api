@@ -69,11 +69,13 @@ Route::controller(OptOutController::class)
     });
 
 Route::get('/campaigns/sample/csv', function () {
-$filepath = public_path('data-samples/campaigns.csv');
-return response()->download($filepath);
+    $filepath = public_path('data-samples/campaigns.csv');
+    $base64 = base64_encode(file_get_contents($filepath));
+    return $base64;
 });
 
 Route::get('/optouts/sample/csv', function () {
-$filepath = public_path('data-samples/optouts.csv');
-return response()->download($filepath);
+    $filepath = public_path('data-samples/optouts.csv');
+    $base64 = base64_encode(file_get_contents($filepath));
+    return $base64;
 });

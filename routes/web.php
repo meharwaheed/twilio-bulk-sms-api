@@ -16,3 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/campaigns/sample/csv', function () {
+    $filepath = public_path('data-samples/campaigns.csv');
+    return response()->download($filepath);
+});
