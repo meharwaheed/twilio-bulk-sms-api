@@ -6,6 +6,7 @@ use App\Jobs\scheduleBulkSms;
 use App\Models\Campaign;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class SendScheduledSMS extends Command
 {
@@ -30,6 +31,7 @@ class SendScheduledSMS extends Command
      */
     public function handle()
     {
+        Log::info("Send Scheduled SMS Command is Working");
         $campaigns = Campaign::whereIsSchedule(true)
             ->whereStatus('pending')
             ->whereRaw('converted_date', '<=', Carbon::now())
