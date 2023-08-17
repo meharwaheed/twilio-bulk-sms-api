@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -26,22 +27,34 @@ class CampaignController extends Controller
     public function index(Request $request): JsonResponse
     {
         $per_page = $request->get('per_page', 10);
-        $data = $this->getGraphData();
 
         $campaign_ids = Campaign::whereUserId(auth()->user()->id)
             ->where('from_number', 'like', '%' . $request->from_number . '%')
             ->pluck('id');
 
-        $data['campaign_messages'] = CampaignNumber::whereIn('campaign_id', $campaign_ids)
-            ->when($request->to_number, function ($query) use ($request) {
-                return $query->where('phone', 'like', '%' . $request->to_number . '%');
-            })
-            ->when($request->status == 'Pending', function ($query) use ($request) {
-                return $query->whereStatus($request->status);
-            })
-            ->with('campaign:id,blast_name,status,from_number')
+        $campaignNumbers = CampaignNumber::whereIn('campaign_id', $campaign_ids);
+        $campaignNumbers->when($request->filled('to_number'), function ($query) use ($request) {
+            return $query->where('phone', 'like', '%' . $request->to_number . '%');
+        });
+        $campaignNumbers->when($request->status == 'Pending', function ($query) use ($request) {
+            return $query->whereStatus($request->status);
+        });
+        $campaignNumbers->when($request->status == 'Delivered', function ($query) use ($request) {
+            return $query->whereStatus(strtolower($request->status));
+        });
+        $campaignNumbers->when($request->status == 'Undelivered', function ($query) use ($request) {
+            return $query->where([['status', '!=', 'Pending'],['status', '!=', 'delivered']]);
+        });
+        $campaignNumbers->when($request->date_range, function ($query) use ($request) {
+            $date = explode('to', $request->date_range);
+            return $query->whereBetween('updated_at', [$date[0], $date[1]]);
+        });
+
+        $data['campaign_messages'] = $campaignNumbers->with('campaign:id,blast_name,status,from_number')
             ->latest()
             ->paginate($per_page);
+
+        list($data['pending'], $data['delivered'], $data['undelivered']) = $this->getGraphData($campaignNumbers);
 
         return $this->respond($data);
     }
@@ -136,53 +149,38 @@ class CampaignController extends Controller
      * Get reports graph
      * @return array
      */
-    private function getGraphData(): array
+    private function getGraphData($campaignNumbers): array
     {
         $lastWeekDates = $this->getDatesArray();
 
-        $data['delivered'] = [];
-        $data['pending'] = [];
-        $data['undelivered'] = [];
+        $delivered = [];
+        $pending = [];
+        $undelivered = [];
 
         foreach ($lastWeekDates as $key => $date) {
-            $campaigns = Campaign::whereUserId(auth()->user()->id)
-                ->whereStatus('delivered')
-                ->whereDate('created_at', $date)
-                ->get();
+            $campaignsNumbersCount = $campaignNumbers->whereStatus('delivered')
+                ->whereDate('created_at', date('Y-m-d', strtotime($date)))
+                ->count();
 
-            $count = 0;
-            foreach ($campaigns as $campaign) {
-                $count += $campaign->campaignNumbers()->count();
-            }
-            $data['delivered'][] = $count > 1 ? $count : (end($data['delivered']) !== false ? end($data['delivered']) : 0);
+            $delivered[] = $campaignsNumbersCount > 1 ? $campaignsNumbersCount : (end($delivered) !== false ? end($delivered) : 0);
         }
 
         foreach ($lastWeekDates as $key => $date) {
-            $campaigns = Campaign::whereUserId(auth()->user()->id)
-                ->whereStatus('pending')
+            $pendings_count = $campaignNumbers->whereStatus('Pending')
                 ->whereDate('created_at', $date)
-                ->get();
+                ->count();
 
-            $count = 0;
-            foreach ($campaigns as $campaign) {
-                $count += $campaign->campaignNumbers()->count();
-            }
-            $data['pending'][] = $count > 1 ? $count : (end($data['pending']) !== false ? end($data['pending']) : 0);
+            $pending[] = $pendings_count > 1 ? $pendings_count : (end($pending) !== false ? end($pending) : 0);
         }
 
         foreach ($lastWeekDates as $key => $date) {
-            $campaigns = Campaign::whereUserId(auth()->user()->id)
-                ->whereStatus('undelivered')
+            $undelivered_count = $campaignNumbers->whereStatus('undelivered')
                 ->whereDate('created_at', $date)
-                ->get();
+                ->count();
 
-            $count = 0;
-            foreach ($campaigns as $campaign) {
-                $count += $campaign->campaignNumbers()->count();
-            }
-            $data['undelivered'][] = $count > 1 ? $count : (end($data['undelivered']) !== false ? end($data['undelivered']) : 0);
+            $undelivered[] = $undelivered_count > 1 ? $undelivered_count : (end($undelivered) !== false ? end($undelivered) : 0);
         }
 
-        return $data;
+        return [$pending, $delivered, $undelivered];
     }
 }
