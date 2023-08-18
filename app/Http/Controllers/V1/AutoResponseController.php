@@ -32,7 +32,6 @@ class AutoResponseController extends Controller
             'message' => 'required|string',
         ]);
 
-        Log::info($request);
 
         $auto_response = AutoResponse::updateOrCreate(
             [
@@ -56,6 +55,9 @@ class AutoResponseController extends Controller
      */
     public function autoResponder(Request $request): JsonResponse
     {
+
+        Log::info($request);
+
         $request->validate(['user_message' => 'required', 'from' => 'required']);
 
         try {
@@ -70,6 +72,7 @@ class AutoResponseController extends Controller
              * Finding auto response message for incoming sms & send auto response to incoming number
              */
             $autoResponse = AutoResponse::wherePhone($request->from)->first();
+            Log::info($autoResponse);
             $twilioClient = $this->twilioClient();
 
             if (isset($autoResponse)) {
