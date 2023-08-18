@@ -8,6 +8,7 @@ use App\Models\CampaignNumber;
 use App\Models\OptOut;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class AutoResponseController extends Controller
 {
@@ -30,6 +31,8 @@ class AutoResponseController extends Controller
             'phone' => 'required|string',
             'message' => 'required|string',
         ]);
+
+        Log::info($request);
 
         $auto_response = AutoResponse::updateOrCreate(
             [

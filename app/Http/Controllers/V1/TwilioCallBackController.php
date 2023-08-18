@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CampaignNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TwilioCallBackController extends Controller
 {
@@ -29,7 +30,7 @@ class TwilioCallBackController extends Controller
      * }
      */
     public function changeSMSDeliveryStatus(Request $request, $compaign_id) {
-
+        Log::info($request);
         $request->validate(['SmsStatus' => 'required', 'To' => 'required']);
 
         CampaignNumber::whereCampaignId($compaign_id)
