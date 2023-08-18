@@ -32,29 +32,28 @@ class CampaignController extends Controller
             ->where('from_number', 'like', '%' . $request->from_number . '%')
             ->pluck('id');
 
-        $campaignNumbers = CampaignNumber::whereIn('campaign_id', $campaign_ids);
-        $campaignNumbers->when($request->filled('to_number'), function ($query) use ($request) {
-            return $query->where('phone', 'like', '%' . $request->to_number . '%');
-        });
-        $campaignNumbers->when($request->status == 'Pending', function ($query) use ($request) {
-            return $query->whereStatus($request->status);
-        });
-        $campaignNumbers->when($request->status == 'Delivered', function ($query) use ($request) {
-            return $query->whereStatus(strtolower($request->status));
-        });
-        $campaignNumbers->when($request->status == 'Undelivered', function ($query) use ($request) {
-            return $query->where([['status', '!=', 'Pending'],['status', '!=', 'delivered']]);
-        });
-        $campaignNumbers->when($request->date_range, function ($query) use ($request) {
-            $date = explode('to', $request->date_range);
-            return $query->whereBetween('updated_at', [$date[0], $date[1]]);
-        });
-
-        $data['campaign_messages'] = $campaignNumbers->with('campaign:id,blast_name,status,from_number')
+        $data['campaign_messages'] = CampaignNumber::whereIn('campaign_id', $campaign_ids)
+            ->when($request->filled('to_number'), function ($query) use ($request) {
+                return $query->where('phone', 'like', '%' . $request->to_number . '%');
+            })
+            ->when($request->status == 'Pending', function ($query) use ($request) {
+                return $query->whereStatus($request->status);
+            })
+            ->when($request->status == 'Delivered', function ($query) use ($request) {
+                return $query->whereStatus(strtolower($request->status));
+            })
+            ->when($request->status == 'Undelivered', function ($query) use ($request) {
+                return $query->where([['status', '!=', 'Pending'],['status', '!=', 'delivered']]);
+            })
+            ->when($request->date_range, function ($query) use ($request) {
+                $date = explode('to', $request->date_range);
+                return $query->whereBetween('updated_at', [$date[0], $date[1]]);
+            })
+            ->with('campaign:id,blast_name,status,from_number')
             ->latest()
             ->paginate($per_page);
 
-        list($data['pending'], $data['delivered'], $data['undelivered']) = $this->getGraphData($campaignNumbers);
+        list($data['pending'], $data['delivered'], $data['undelivered']) = $this->getGraphData($request, $campaign_ids);
 
         return $this->respond($data);
     }
@@ -146,10 +145,13 @@ class CampaignController extends Controller
     }
 
     /**
-     * Get reports graph
-     * @return array
+     * Get graph data
+     *
+     * @param $request
+     * @param $campaign_ids
+     * @return array[]
      */
-    private function getGraphData($campaignNumbers): array
+    private function getGraphData($request, $campaign_ids)
     {
         $lastWeekDates = $this->getDatesArray();
 
@@ -158,7 +160,20 @@ class CampaignController extends Controller
         $undelivered = [];
 
         foreach ($lastWeekDates as $key => $date) {
-            $campaignsNumbersCount = $campaignNumbers->whereStatus('delivered')
+            $campaignsNumbersCount = CampaignNumber::whereIn('campaign_id', $campaign_ids)
+                ->when($request->filled('to_number'), function ($query) use ($request) {
+                    return $query->where('phone', 'like', '%' . $request->to_number . '%');
+                })
+                ->when($request->filled('date_range'), function ($query) use ($request) {
+                    $date = explode('to', $request->date_range);
+                    return $query->whereBetween('updated_at', [$date[0], $date[1]]);
+                })
+                ->when($request->filled('status') && $request->status !== 'Delivered', function ($query) {
+                    return $query->whereNull('status');
+                })
+                ->when(!$request->status || $request->status == 'Delivered', function ($query) {
+                    return $query->whereStatus('delivered');
+                })
                 ->whereDate('created_at', date('Y-m-d', strtotime($date)))
                 ->count();
 
@@ -166,16 +181,42 @@ class CampaignController extends Controller
         }
 
         foreach ($lastWeekDates as $key => $date) {
-            $pendings_count = $campaignNumbers->whereStatus('Pending')
-                ->whereDate('created_at', $date)
+            $pendings_count = CampaignNumber::whereIn('campaign_id', $campaign_ids)
+                ->when($request->filled('to_number'), function ($query) use ($request) {
+                    return $query->where('phone', 'like', '%' . $request->to_number . '%');
+                })
+                ->when($request->filled('date_range'), function ($query) use ($request) {
+                    $date = explode('to', $request->date_range);
+                    return $query->whereBetween('updated_at', [$date[0], $date[1]]);
+                })
+                ->when($request->filled('status') && $request->status !== 'Pending', function ($query) {
+                    return $query->whereNull('status');
+                })
+                ->when(!$request->status || $request->status == 'Pending', function ($query) {
+                    return $query->whereStatus('Pending');
+                })
+                ->whereDate('created_at', date('Y-m-d', strtotime($date)))
                 ->count();
 
             $pending[] = $pendings_count > 1 ? $pendings_count : (end($pending) !== false ? end($pending) : 0);
         }
-
+//
         foreach ($lastWeekDates as $key => $date) {
-            $undelivered_count = $campaignNumbers->whereStatus('undelivered')
-                ->whereDate('created_at', $date)
+            $undelivered_count = CampaignNumber::whereIn('campaign_id', $campaign_ids)
+                ->when($request->filled('to_number'), function ($query) use ($request) {
+                    return $query->where('phone', 'like', '%' . $request->to_number . '%');
+                })
+                ->when($request->filled('date_range'), function ($query) use ($request) {
+                    $date = explode('to', $request->date_range);
+                    return $query->whereBetween('updated_at', [$date[0], $date[1]]);
+                })
+                ->when($request->filled('status') && $request->status !== 'Undelivered', function ($query) {
+                    return $query->whereNull('status');
+                })
+                ->when(!$request->status || $request->status == 'Undelivered', function ($query) {
+                    return $query->whereNotIn('status', ['Pending', 'delivered', 'sent']);
+                })
+                ->whereDate('created_at', date('Y-m-d', strtotime($date)))
                 ->count();
 
             $undelivered[] = $undelivered_count > 1 ? $undelivered_count : (end($undelivered) !== false ? end($undelivered) : 0);

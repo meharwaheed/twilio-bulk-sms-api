@@ -7,12 +7,13 @@ use App\Models\Voip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
+use Twilio\TwiML\VoiceResponse;
 
 class VoipController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
+        $this->middleware('auth:sanctum')->except(['respondToIncomingCall']);
     }
 
 
@@ -39,12 +40,26 @@ class VoipController extends Controller
         }
         $voip = Voip::updateOrCreate(
             [
-                'phone' => $validated['phone'],
+                'phone' => '+' . str_replace('+', '', $validated['phone']),
                 'user_id' => auth()->user()->id
             ],
             ['file' => $validated['file']],
         );
 
         return $this->respond(data: $voip, message: 'Voip store successfully');
+    }
+
+
+    public function respondToIncomingCall(Request $request)
+    {
+        $response = new VoiceResponse;
+
+        $voip = Voip::wherePhone($request->from)->first();
+        if (isset($voip)) {
+            $response->play($voip->file_path);
+            return $response;
+        } else {
+            return $this->error(message: 'Voip not found');
+        }
     }
 }

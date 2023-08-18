@@ -54,6 +54,7 @@ Route::controller(AutoResponseController::class)
 Route::group(['prefix'=>'twilio'], function(){
     Route::post('/sms-auto-responder-callback', [AutoResponseController::class, 'autoResponder']);
     Route::post('/sms-delivery-status-callback/{campaign_id}', [TwilioCallBackController::class, 'changeSMSDeliveryStatus']);
+    Route::post('/voip' , [VoipController::class, 'respondToIncomingCall']);
 });
 
 Route::controller(VoipController::class)

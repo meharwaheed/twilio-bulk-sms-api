@@ -33,7 +33,7 @@ class AutoResponseController extends Controller
 
         $auto_response = AutoResponse::updateOrCreate(
             [
-                'phone' => $validated['phone'],
+                'phone' => "+" . str_replace('+', '', $validated['phone']),
                 'user_id' => auth()->user()->id
             ],
             ['message' => $validated['message']]
