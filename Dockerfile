@@ -13,4 +13,4 @@ RUN chmod -R 777 /home/app/public \
     && mkdir -p /home/app/bootstrap/cache \
     && chmod -R 777 /home/app/bootstrap/cache \
     && cd /home/app \
-    && composer install && cp .env.example .env && php artisan key:generate
+    && composer install && cp .env.example .env && php artisan key:generate && php artisan storage:link
