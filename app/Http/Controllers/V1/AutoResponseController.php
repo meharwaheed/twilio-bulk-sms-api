@@ -8,6 +8,7 @@ use App\Models\CampaignNumber;
 use App\Models\OptOut;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class AutoResponseController extends Controller
 {
@@ -31,6 +32,7 @@ class AutoResponseController extends Controller
             'message' => 'required|string',
         ]);
 
+
         $auto_response = AutoResponse::updateOrCreate(
             [
                 'phone' => "+" . str_replace('+', '', $validated['phone']),
@@ -53,6 +55,9 @@ class AutoResponseController extends Controller
      */
     public function autoResponder(Request $request): JsonResponse
     {
+
+        Log::info($request);
+
         $request->validate(['user_message' => 'required', 'from' => 'required']);
 
         try {
@@ -67,6 +72,7 @@ class AutoResponseController extends Controller
              * Finding auto response message for incoming sms & send auto response to incoming number
              */
             $autoResponse = AutoResponse::wherePhone($request->from)->first();
+            Log::info($autoResponse);
             $twilioClient = $this->twilioClient();
 
             if (isset($autoResponse)) {
