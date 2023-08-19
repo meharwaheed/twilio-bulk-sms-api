@@ -36,7 +36,7 @@ class Campaign extends Model
     public function formattedDate(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->is_schedule ? date('d-m-Y h:i:s a', strtotime($this->converted_date)) : date('d-m-Y h:i:s A', strtotime($this->created_at))
+            get: fn() => $this->is_schedule ? date('d-m-Y h:i:s A', strtotime($this->converted_date)) : date('d-m-Y h:i:s A', strtotime($this->created_at))
         );
     }
 
