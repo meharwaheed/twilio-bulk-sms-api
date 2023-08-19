@@ -74,7 +74,7 @@ class AutoResponseController extends Controller
 
         Log::info($request);
 
-        $request->validate(['user_message' => 'required', 'from' => 'required']);
+        $request->validate(['from' => 'required']);
 
         try {
             $outKeyword = OptOut::whereOutKeywords($request->user_message)->first();
