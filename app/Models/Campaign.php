@@ -24,12 +24,19 @@ class Campaign extends Model
         'converted_date'
     ];
 
-    protected $appends = ['csv_file_path'];
+    protected $appends = ['csv_file_path', 'formatted_date'];
 
     public function csvFilePath(): Attribute
     {
         return new Attribute(
             get: fn() => $this->csv_file ? asset('storage') . '/' . $this->csv_file : null
+        );
+    }
+
+    public function formattedDate(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->is_schedule ? date('d-m-Y h:i:s A', strtotime($this->converted_date)) : date('d-m-Y h:i:s A', strtotime($this->created_at))
         );
     }
 
