@@ -9,6 +9,7 @@ use App\Models\OptOut;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AutoResponseController extends Controller
 {
@@ -18,6 +19,21 @@ class AutoResponseController extends Controller
         $this->middleware('auth:sanctum')->except(['autoResponder']);
     }
 
+    /**
+     * Get auto response
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request)
+    {
+        $per_page = $request->get('per_page', 10);
+
+        $auto_response = AutoResponse::whereUserId(auth()->user()->id)
+            ->latest()
+            ->paginate($per_page);
+
+        return $this->respond($auto_response);
+    }
 
     /**
      * Store auto response for phone number
@@ -89,5 +105,19 @@ class AutoResponseController extends Controller
         } catch (\Exception $e) {
             return $this->error(message: $e->getMessage());
         }
+    }
+
+
+    /**
+     * Delete Specific auto response from database
+     *
+     * @param $id
+     * @return JsonResponse
+     */
+    public function delete($id) {
+        $auto_response = AutoResponse::findOrFail($id);
+        $auto_response->delete();
+
+        return $this->respond($auto_response, 'Auto response delete successfully');
     }
 }

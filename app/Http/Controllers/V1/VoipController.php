@@ -17,6 +17,18 @@ class VoipController extends Controller
     }
 
 
+    public function index(Request $request)
+    {
+        $per_page = $request->get('per_page', 10);
+
+        $voips = Voip::whereUserId(auth()->user()->id)
+            ->latest()
+            ->paginate($per_page);
+
+        return $this->respond($voips);
+    }
+
+
     /**
      * @param Request $request
      * @return JsonResponse
@@ -61,5 +73,22 @@ class VoipController extends Controller
         } else {
             return $this->error(message: 'Voip not found');
         }
+    }
+
+    /**
+     * Delete Specific voip from database
+     *
+     * @param $id
+     * @return JsonResponse
+     */
+    public function delete($id)
+    {
+        $voip = Voip::findOrFail($id);
+        if (Storage::exists($voip->file)) {
+            Storage::disk(env('STORAGE_DISK', 'public'))->delete($voip->file);
+        }
+        $voip->delete();
+
+        return $this->respond($voip, 'Voip delete successfully');
     }
 }

@@ -41,13 +41,15 @@ Route::controller(CampaignController::class)
         Route::get('/reports', 'index');
         Route::post('/csv', 'store');
         Route::get('/schedule/bulk-sms', 'getScheduleSms');
+        Route::get('/download/csv/{id}', 'downloadCampaignCsvFile');
     });
 
 Route::controller(AutoResponseController::class)
     ->prefix('auto-response')
     ->group(function () {
         Route::post('/store', 'store');
-//        Route::post('/send', 'autoResponder');
+        Route::get('/get', 'index');
+        Route::delete('/delete/{id}', 'delete');
     });
 
 
@@ -61,6 +63,8 @@ Route::controller(VoipController::class)
     ->prefix('voip')
     ->group(function () {
         Route::post('/store', 'store');
+        Route::get('/get', 'index');
+        Route::delete('/delete/{id}', 'delete');
     });
 
 Route::controller(OptOutController::class)

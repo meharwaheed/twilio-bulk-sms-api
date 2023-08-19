@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Actions\SendBulkSMS;
+use App\Exports\CampaignNumbersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateBulkSmsRequest;
 use App\Imports\CampaignNumbersImport;
@@ -21,7 +22,7 @@ class CampaignController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
+        $this->middleware('auth:sanctum')->except('downloadCampaignCsvFile');
     }
 
     public function index(Request $request): JsonResponse
@@ -69,7 +70,7 @@ class CampaignController extends Controller
     {
         $per_page = $request->get('per_page', 10);
         $data = Campaign::whereUserId(auth()->user()->id)
-            ->whereIsSchedule(true)
+//            ->whereIsSchedule(true)
             ->latest()
             ->paginate($per_page);
 
@@ -223,5 +224,11 @@ class CampaignController extends Controller
         }
 
         return [$pending, $delivered, $undelivered];
+    }
+
+
+    public function downloadCampaignCsvFile($campaign_id)
+    {
+        return Excel::download(new CampaignNumbersExport($campaign_id), 'active-campaign-numbers.csv');
     }
 }
