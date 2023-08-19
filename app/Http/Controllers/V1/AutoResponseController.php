@@ -87,7 +87,7 @@ class AutoResponseController extends Controller
             /**
              * Finding auto response message for incoming sms & send auto response to incoming number
              */
-            $autoResponse = AutoResponse::wherePhone($request->From)->first();
+            $autoResponse = AutoResponse::wherePhone($request->To)->first();
             Log::info($autoResponse);
             $twilioClient = $this->twilioClient();
 
