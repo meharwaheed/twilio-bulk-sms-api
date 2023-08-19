@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +37,7 @@ class Campaign extends Model
     public function formattedDate(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->is_schedule ? date('d-m-Y h:i:s A', strtotime($this->converted_date)) : date('d-m-Y h:i:s A', strtotime($this->created_at))
+            get: fn() => $this->is_schedule ? Carbon::parse($this->schedule_date)->setTimezone($this->timezone)->format('d-m-Y h:i:s A') : date('d-m-Y h:i:s A', strtotime($this->created_at))
         );
     }
 

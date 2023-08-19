@@ -74,25 +74,25 @@ class AutoResponseController extends Controller
 
         Log::info($request);
 
-        $request->validate(['from' => 'required']);
+        $request->validate(['From' => 'required']);
 
         try {
-            $outKeyword = OptOut::whereOutKeywords($request->user_message)->first();
-            $inKeyword = OptOut::whereInKeywords($request->user_message)->first();
+            $outKeyword = OptOut::whereOutKeywords($request->Body)->first();
+            $inKeyword = OptOut::whereInKeywords($request->Body)->first();
 
-            isset($outKeyword) && CampaignNumber::wherePhone($request->from)->update(['is_active' => 0]);
-            isset($inKeyword) && CampaignNumber::wherePhone($request->from)->update(['is_active' => 1]);
+            isset($outKeyword) && CampaignNumber::wherePhone($request->From)->update(['is_active' => 0]);
+            isset($inKeyword) && CampaignNumber::wherePhone($request->From)->update(['is_active' => 1]);
 
 
             /**
              * Finding auto response message for incoming sms & send auto response to incoming number
              */
-            $autoResponse = AutoResponse::wherePhone($request->from)->first();
+            $autoResponse = AutoResponse::wherePhone($request->From)->first();
             Log::info($autoResponse);
             $twilioClient = $this->twilioClient();
 
             if (isset($autoResponse)) {
-                $twilioClient->messages->create($request->from, [
+                $twilioClient->messages->create($request->From, [
                     "body" => $autoResponse->message,
                     "from" => env('TWILIO_FROM_NUMBER')
                 ]);
