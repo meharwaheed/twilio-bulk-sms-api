@@ -34,7 +34,7 @@ class SendScheduledSMS extends Command
         Log::info("Send Scheduled SMS Command is Working");
         $campaigns = Campaign::whereIsSchedule(true)
             ->whereStatus('pending')
-            ->whereDate('converted_date', '<=', Carbon::now())
+            ->where('converted_date', '<=', Carbon::now()->format('Y-m-d H:i:s'))
             ->count();
         if($campaigns > 0) {
             scheduleBulkSms::dispatch();
